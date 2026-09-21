@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "sudonim.yolocam",
+  "name": "YoloCam S3",
+  "version": "0.2.1",
+  "author": "Colin Nederkoorn",
+  "description": "YoloCam S3 settings with verified readback and USB fallback.",
+  "kinds": ["bar-widget"],
+  "entryPoints": {"barWidget": "Panel.qml"},
+  "barWidget": {"displayName": "YoloCam S3", "description": "Focus, exposure, white balance and image controls", "category": "System", "allowMultiple": false}
+}

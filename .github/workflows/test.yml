@@ -1,0 +1,21 @@
+name: Tests
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install test dependency
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install -r requirements.txt
+      - name: Test camera adapter without hardware
+        run: .venv/bin/python -B -m unittest discover -s .
+      - name: Check setup script and manifest JSON
+        run: |
+          bash -n install.sh
+          python3 -m json.tool manifest.json >/dev/null

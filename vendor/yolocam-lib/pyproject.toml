@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yolocam"
+version = "0.1.0"
+description = "YoloCam S3 control protocol library"
+license = "GPL-3.0-or-later"
+requires-python = ">=3.10"
+dependencies = [
+    "protobuf>=4.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["yolocam*"]

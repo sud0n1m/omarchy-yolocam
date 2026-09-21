@@ -1,0 +1,530 @@
+syntax = "proto3";
+
+package tv.yunxi.protobuf;
+
+enum MessageType {
+    TYPE_NONE = 0;
+    TYPE_REQUEST = 1;
+    TYPE_SET = 2;
+    TYPE_POST = 3;
+    TYPE_RESPONSE = 4;
+    TYPE_NOTIFY = 5;
+}
+
+enum CommandId {
+    CID_NONE = 0;
+    CID_VERSION_INFO = 1;
+    CID_UPDATE_ROM = 2;
+    CID_TRANSFORM_FILE = 3;
+    CID_SCENE = 4;
+    CID_FRAME_RATE = 5;
+    CID_RESOLUTION = 6;
+    CID_BRIGHTNESS = 7;
+    CID_SHARPNESS = 8;
+    CID_CONTRAST = 9;
+    CID_SATURATION = 10;
+    CID_HUE = 11;
+    CID_GAMMA = 12;
+    CID_ZOOM = 13;
+    CID_EXPOSURE_MODE = 14;
+    CID_EXPOSURE_EV = 15;
+    CID_ANTI_FLICKER = 16;
+    CID_EXPOSURE_ISO = 17;
+    CID_EXPOSURE_TIME = 18;
+    CID_EXPOSURE_ABSOLUTE_TIME = 19;
+    CID_EXPOSURE_APERTURE = 20;
+    CID_WHITE_BALANCE_MODE = 21;
+    CID_WHITE_BALANCE_TEMPERATURE = 22;
+    CID_FOCUS_MODE = 23;
+    CID_FOCUS_TARGET_LOCATION = 24;
+    CID_FOCUS_TARGET_DISTANCE = 25;
+    CID_ENABLE_DISTORTION = 26;
+    CID_ENABLE_SHADING = 27;
+    CID_EVENT_UPGRADE = 28;
+    CID_APP_ENV_MODE = 29;
+    CID_LENS_EVENT = 30;
+    CID_RANGE_OF_APERTURE = 31;
+    CID_RANGE_OF_EXP_TIME = 32;
+    CID_WHITE_BALANCE_OFFSET = 33;
+    CID_FOCUS_AREA_EVENT = 34;
+    CID_ERR_OCCURRED_EVENT = 35;
+    CID_DUMP_LOG = 36;
+    CID_LOG_PACKET = 37;
+    CID_FOCUS_RECT_LEVEL = 38;
+    CID_FOCUS_TARGET_LOCATION_S = 39;
+    CID_ACTUAL_EXP_ISO = 40;
+    CID_ACTUAL_EXP_TIME = 41;
+    CID_ENABLE_CAF = 42;
+    CID_ENABLE_DEBUG_MAIN_LAYER = 43;
+    CID_ENABLE_DEBUG_DEPTH_LAYER = 44;
+    CID_ENABLE_DEBUG_TARGET_LAYER = 45;
+    CID_SELECT_DEPTH_AREA = 46;
+    CID_TRIGGER_SPEED = 47;
+    CID_LENS_STATUS = 48;
+    CID_LENS_BASIC_INFO = 49;
+    CID_TUNING_FILE_INFO = 50;
+    CID_TUNING_FILE_EVENT = 51;
+    CID_TUNING_FILE_PKT = 52;
+    CID_TUNING = 53;
+    CID_SUPPORTED_TOF_CHANNELS = 54;
+    CID_TOF_CHANNEL_ID = 55;
+    CID_START_PROFILER = 56;
+    CID_TRANSPORT_PROFILER = 57;
+    CID_USB_TRANSFER_MODE = 58;
+    CID_FACE_BOUNDING_BOXES = 59;
+    CID_USB_VERSION = 60;
+    CID_HDMI_OUTPUT_FORMAT = 61;
+    CID_LENS_AMEND_CURVE = 62;
+    CID_GET_LENS_DETAIL = 63;
+    CID_LENS_RESET = 64;
+    CID_HDMI_COLOR_SPACE = 65;
+    CID_TERMINATED_BY_CAMERA = 66;
+    CID_BLE_SCAN_ON = 67;
+    CID_BLE_SCAN_OFF = 68;
+    CID_BLE_CONNECT = 69;
+    CID_BLE_DISCONNECT = 70;
+    CID_BLE_ADV_LIST = 71;
+    CID_BLE_ADV_CHANGED = 72;
+    CID_AU_VOLUME = 73;
+    CID_AU_VOLUME_BAR = 74;
+    CID_AU_DENOISE = 75;
+    CID_AU_REVERB = 76;
+    CID_AU_DELAY = 77;
+    CID_AU_AUTO_GAIN = 78;
+    CID_AU_MIC_TYPE = 79;
+    CID_AU_MIC_STATUS = 80;
+    CID_AU_MIC_EVENT = 81;
+    CID_LIGHT_STATUS_EVENT = 82;
+    CID_LIGHT_GET_STATUS = 83;
+    CID_LIGHT_CONNECT_EVENT = 84;
+    CID_LIGHT_SWITCH = 85;
+    CID_LIGHT_BRIGHTNESS = 86;
+    CID_LIGHT_COLOR_TEMP = 87;
+    CID_LENS_RESET_ONCE = 88;
+    CID_LIGHT_GET_CONNECTED_LIST = 89;
+    CID_AU_CODEC_GRADE = 90;
+    CID_INDICATOR_CTL = 91;
+    CID_DUMP_RAW = 92;
+    CID_DUMP_YUV = 93;
+    CID_ENABLE_CLUT = 94;
+    CID_CLUT_FILE = 95;
+    CID_CLUT_ATTR = 96;
+    CID_DUMP_PD_RAW = 97;
+    CID_ENABLE_HDR = 98;
+    CID_AI_TRACKING_CTRL = 99;
+    CID_DUMP_RAW_AE = 100;
+    CID_START_AI_PARAMS = 101;
+    CID_DYNAMIC_RANGE = 102;
+    CID_AU_VERSION = 103;
+    CID_WHITE_BALANCE_LOCK = 104;
+    CID_WHITE_BALANCE_TEMPERATURE_SHIFT = 105;
+    CID_EXPOSURE_LOCK = 106;
+    CID_BLE_OTA_FILE = 107;
+    CID_BLE_OTA_STATUS_EVENT = 108;
+    CID_BLE_GET_VERSION = 109;
+    CID_DUMP_RAW_YUV = 110;
+    CID_MANU_FOCUS_CODE = 111;
+    CID_ZOOM_SPEED = 112;
+    CID_LENS_VERSION = 113;
+    CID_STREAM_CFG = 202;
+    CID_STREAMING_START = 203;
+    CID_STREAMING_STOP = 204;
+    CID_RECORDING_START = 205;
+    CID_RECORDING_STOP = 206;
+    CID_STREAMING_STOPPED = 207;
+    CID_RECORDING_FINISHED = 208;
+    CID_DURATION_CHANGED = 209;
+    CID_VIDEO_STATUS_CHANGED = 210;
+    CID_ENABLE_UVC = 211;
+    CID_ENABLE_LOWPOWER_LED = 212;
+    CID_LOWPOWER_STATUS = 213;
+    CID_ENABLE_FACE_ROI = 214;
+    CID_STREAM_HEARTBEAT = 215;
+    CID_DISK_INFO = 301;
+    CID_DISK_FORMAT = 302;
+    CID_DISK_EVENT = 303;
+    CID_PTZ_RESET = 401;
+    CID_PTZ_POSITION = 402;
+    CID_PTZ_SPEED_LEVEL = 403;
+    CID_PTZ_DIRECTION = 404;
+    CID_PTZ_START_MOVING = 405;
+    CID_PTZ_STOP_MOVING = 406;
+    CID_PTZ_PRESET_POSITIONS = 407;
+    CID_PTZ_PRESET_POS = 408;
+    CID_CONFIGURE_WLAN = 501;
+    CID_WIFI_LIST = 502;
+    CID_RC_EVENT = 503;
+    CID_UNCONFIGURE_WLAN = 504;
+    CID_REMOTE_CTL_CONNECT_EVENT = 505;
+    CID_REMOTE_CTL_OTA_STATUS_EVENT = 506;
+    CID_REMOTE_CTL_GET_VERSION = 507;
+    CID_REMOTE_CTL_GET_STATUS = 508;
+    CID_REMOTE_CTL_OTA_FILE = 509;
+    DID_DRAW_LOG = 601;
+}
+
+message ManualExposureParams {
+    uint32 iso = 1;
+    uint32 shutter = 2;
+    uint32 aperture = 3;
+}
+
+message WhiteBalanceManual {
+    uint32 saturation = 1;
+    uint32 chroma = 2;
+}
+
+message WhiteBalanceOffset {
+    uint32 offset_r = 1;
+    uint32 offset_b = 2;
+}
+
+message Size {
+    uint32 width = 1;
+    uint32 height = 2;
+}
+
+message Range {
+    uint32 min = 1;
+    uint32 max = 2;
+}
+
+message RectF {
+    float left = 1;
+    float top = 2;
+    float right = 3;
+    float bottom = 4;
+}
+
+message Rect {
+    uint32 left = 1;
+    uint32 top = 2;
+    uint32 right = 3;
+    uint32 bottom = 4;
+}
+
+message FileInfo {
+    string file_path = 1;
+    string md5_info = 2;
+    string version = 3;
+}
+
+message VersionInfo {
+    string sys_version = 1;
+    string unique_id = 2;
+    string serial_num = 3;
+    string sys_code = 4;
+}
+
+message UpgradeEvent {
+    uint32 status = 1;
+    uint32 value = 2;
+}
+
+message TuningParam {
+    uint32 brightness = 1;
+    float curve = 2;
+    uint32 color_temp = 3;
+}
+
+message TuningFileInfo {
+    string description = 1;
+    string file_md5 = 2;
+    string scene_extra = 3;
+    string version = 4;
+}
+
+message TuningClutFile {
+    uint32 clut_size = 1;
+    repeated uint32 clut_data = 2;
+    string hsv_data = 3;
+    string extra = 4;
+    string updataflag = 5;
+}
+
+message TransportFile {
+    string file_path = 1;
+    string md5_info = 2;
+}
+
+message LensInfo {
+    string serial_number = 1;
+}
+
+message LensDetail {
+    uint32 lens_id = 1;
+    uint32 aperture = 2;
+    uint32 aperture_min = 3;
+    uint32 aperture_max = 4;
+    uint32 focal = 5;
+    uint32 detected = 6;
+    uint32 drive_times = 7;
+    uint32 drive_times_total = 8;
+    uint32 plug_times = 9;
+    uint32 plug_times_total = 10;
+    string serino = 11;
+    string hardware_version = 12;
+    uint32 origin_distance = 13;
+    uint32 amend_distance = 14;
+}
+
+message LensAmend {
+    uint32 lens_id = 1;
+    string serial = 2;
+}
+
+message LensReset {
+    uint32 lens_id = 1;
+}
+
+message StreamParam {
+    VEncParam venc_param = 1;
+    AEncParam aenc_param = 2;
+}
+
+message VEncParam {
+    uint32 codec = 1;
+    uint32 width = 2;
+    uint32 height = 3;
+    uint32 bitrate = 4;
+    uint32 rate = 5;
+    uint32 profile = 6;
+}
+
+message AEncParam {
+    uint32 codec = 1;
+    uint32 channels = 2;
+    uint32 sample_rate = 3;
+    uint32 bitrate = 4;
+}
+
+message StreamConfig {
+    OutputProtocol protocol = 1;
+    uint32 audio_enable = 2;
+}
+
+enum OutputProtocol {
+    OUTPUT_NONE = 0;
+    OUTPUT_RTMP = 1;
+    OUTPUT_RTSP = 2;
+    OUTPUT_SRT = 3;
+}
+
+message IndicatorCtl {
+    uint32 mode = 1;
+    uint32 brightness = 2;
+}
+
+message AiTrackingCtrl {
+    uint32 mode = 1;
+}
+
+message AiParams {
+    uint32 exp_iso = 1;
+    uint32 wb_r_gain = 2;
+    uint32 wb_b_gain = 3;
+}
+
+message ListInt {
+    repeated int32 values = 1;
+}
+
+message ListRectF {
+    repeated RectF values = 1;
+}
+
+message LensStatusEvent {
+    uint32 status = 1;
+}
+
+message LensVersionInfo {
+    string current_version = 1;
+    string latest_version = 2;
+}
+
+message PtzCtrl {
+    uint32 direction = 1;
+    uint32 speed = 2;
+}
+
+message PtzPosition {
+    float pitch = 1;
+    float yaw = 2;
+}
+
+message PtzSpeedLevel {
+    uint32 level = 1;
+}
+
+message PresetPos {
+    uint32 key = 1;
+    PtzPosition position = 2;
+}
+
+message PresetPositions {
+    repeated PresetPos entries = 1;
+}
+
+message DumpPdParam {
+    uint32 mode = 1;
+}
+
+message WlanConf {
+    string ssid = 1;
+    string psk = 2;
+    string key_mgmt = 3;
+}
+
+message WifiNetwork {
+    string ssid = 1;
+    string bssid = 2;
+    string flags = 3;
+}
+
+message WifiScanResults {
+    repeated WifiNetwork results = 1;
+}
+
+message BleScanParam {
+    uint32 cfg = 1;
+    int32 rssi = 2;
+    string name = 3;
+}
+
+message VideoStatus {
+    uint32 status = 1;
+}
+
+message DiskInfo {
+    uint32 total_size = 1;
+    uint32 available_size = 2;
+    uint32 fs_type = 3;
+    string smb_path = 4;
+}
+
+message RawImgInfo {
+    string file_path = 1;
+}
+
+message RCEvent {
+    uint32 rc_key = 1;
+    uint32 rc_key_status = 2;
+}
+
+message LightParam {
+    uint32 brightness = 1;
+    uint32 color_temp = 2;
+    string mac = 3;
+}
+
+message LightStatus {
+    uint32 status = 1;
+    string mac = 2;
+}
+
+message LightConnection {
+    string name = 1;
+    string mac = 2;
+}
+
+message LightConnectedList {
+    repeated LightConnection entries = 1;
+}
+
+message DrawRect {
+    uint32 left = 1;
+    uint32 top = 2;
+    uint32 right = 3;
+    uint32 bottom = 4;
+    uint32 color = 5;
+}
+
+message DrawText {
+    uint32 left = 1;
+    uint32 top = 2;
+    string context = 3;
+    uint32 color = 4;
+}
+
+message DrawInfo {
+    repeated DrawRect rects = 1;
+    repeated DrawText texts = 2;
+}
+
+message DrawInfoList {
+    repeated DrawInfo entries = 1;
+}
+
+message AdvInfo {
+    string name = 1;
+    string mac = 2;
+    int32 rssi = 3;
+}
+
+message AdvInfoList {
+    repeated AdvInfo entries = 1;
+}
+
+message StreamingOutput {
+    string url = 1;
+    string url_wlan = 2;
+    string file_fmt = 3;
+}
+
+message CommandBody {
+    oneof value {
+        uint32 int_val = 1;
+        string str_val = 2;
+        ManualExposureParams exposure_params = 3;
+        WhiteBalanceManual white_balance_manual = 4;
+        TransportFile transport_file = 5;
+        Size size = 6;
+        Range range = 7;
+        Rect rect = 8;
+        FileInfo file_info = 9;
+        VersionInfo version_info = 10;
+        UpgradeEvent upgrade_event = 11;
+        LensStatusEvent lens_event = 12;
+        WhiteBalanceOffset white_balance_offset = 13;
+        RectF rect_f = 14;
+        LensInfo lens_info = 15;
+        TuningFileInfo tuning_file_info = 16;
+        TuningParam tuning_param = 17;
+        ListInt list_int = 18;
+        ListRectF list_rect_f = 19;
+        LensDetail lens_detail = 20;
+        LensAmend lens_amend = 21;
+        LensReset lens_reset = 22;
+        BleScanParam ble_scan_param = 23;
+        AdvInfo adv_info = 24;
+        LightConnection light_connection = 25;
+        LightStatus light_status = 26;
+        LightParam light_param = 27;
+        LightConnectedList light_connected_list = 28;
+        IndicatorCtl indicator_ctl = 29;
+        RawImgInfo raw_img_info = 30;
+        TuningClutFile tuning_clut_file = 31;
+        WlanConf wlan_conf = 32;
+        StreamParam stream_param = 33;
+        DiskInfo disk_info = 34;
+        PtzCtrl ptz_ctrl = 35;
+        DumpPdParam dump_pd_param = 36;
+        RCEvent rc_event = 37;
+        WifiScanResults wifi_list = 38;
+        AiTrackingCtrl ai_tracking_ctrl = 39;
+        AiParams ai_params = 40;
+        VideoStatus video_status = 41;
+        DrawInfoList draw_info_list = 42;
+        AdvInfoList adv_list = 43;
+        LensVersionInfo lens_version_info = 44;
+    }
+}
+
+message Message {
+    MessageType type = 1;
+    uint32 seq = 2;
+    uint32 timeout = 3;
+    uint32 resp_code = 4;
+    CommandId id = 5;
+    CommandBody body = 6;
+}
