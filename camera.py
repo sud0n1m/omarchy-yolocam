@@ -101,28 +101,44 @@ def control_endpoint(dev):
     raise RuntimeError("The S3 USB control network is not configured.")
 
 
-def native_controls(client):
+DEPENDENCIES = {
+    "exposure-ev": ("exposure-mode", 0),
+    "exposure-iso": ("exposure-mode", 1),
+    "exposure-time": ("exposure-mode", 1),
+    "wb-temp": ("wb-mode", 0),
+}
+
+
+def related_controls(name, after=False):
+    if name not in NAMES:
+        raise ValueError("Unsupported setting.")
+    names = {name}
+    if name in DEPENDENCIES:
+        names.add(DEPENDENCIES[name][0])
+    if after:
+        names.update(n for n, (mode, _) in DEPENDENCIES.items() if mode == name)
+    return [n for n in NAMES if n in names]
+
+
+def native_controls(client, names=None):
     from yolocam.params import PARAMS, sharpness_from_wire
     result = []
-    for name, label in NAMES.items():
+    for name in NAMES if names is None else names:
+        label = NAMES[name]
         p = PARAMS[name]
         value = client.get_param_raw(name)
-        if value is None:
-            raise RuntimeError("Camera did not return " + label)
-        if name == "sharpness":
+        available = value is not None
+        if available and name == "sharpness":
             value = sharpness_from_wire(value)
         options = p.value_map or ({0: "Off", 1: "On"} if p.control_type == "toggle" else {})
         result.append(dict(id=name, label=label, kind="choice" if options else "slider",
                            minimum=p.min_val, maximum=p.max_val, step=1, value=value,
-                           options=[dict(value=k, label=v) for k, v in options.items()], writable=True))
+                           options=[dict(value=k, label=v) for k, v in options.items()], available=available, writable=available, requires=DEPENDENCIES.get(name)))
     values = {c["id"]: c["value"] for c in result}
     for c in result:
-        if c["id"] in ("exposure-iso", "exposure-time"):
-            c["writable"] = values["exposure-mode"] == 1
-        elif c["id"] == "wb-temp":
-            c["writable"] = values["wb-mode"] == 0
-        elif c["id"] == "exposure-ev":
-            c["writable"] = values["exposure-mode"] == 0
+        if c["id"] in DEPENDENCIES:
+            mode, required = DEPENDENCIES[c["id"]]
+            c["writable"] = c["available"] and values.get(mode) == required
     return result
 
 
@@ -204,8 +220,20 @@ def operate(args):
         mode = next((m for m in settings["previewModes"] if m["id"] == settings["previewMode"]), None)
         if mode is None:
             raise RuntimeError("No supported MJPEG preview formats are available.")
-        subprocess.Popen(preview_command(dev, mode), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                         start_new_session=True)
+        # A regular temporary file avoids a full pipe blocking a detached mpv.
+        # The descriptor remains valid in mpv after this helper closes its copy.
+        with tempfile.TemporaryFile(mode="w+") as log:
+            process = subprocess.Popen(preview_command(dev, mode), stdout=log, stderr=log,
+                                       start_new_session=True)
+            try:
+                code = process.wait(timeout=0.6)
+            except subprocess.TimeoutExpired:
+                pass
+            else:
+                if code:
+                    log.seek(0)
+                    detail = log.read()[-1200:].strip()
+                    raise RuntimeError("Preview could not start. Close other camera apps and try again. " + detail)
         return dict(ok=True, message=f"Opening {mode['width']} × {mode['height']} at {mode['fps']:g} fps. Close the preview to release the camera.", **settings)
     if args != ["status"] and not (len(args) == 4 and args[0] == "set" and args[1] in ("usb", "full")):
         raise ValueError("Use status, preview, or set usb|full NAME VALUE.")
@@ -217,11 +245,13 @@ def operate(args):
     # Do not silently change transports for writes: the displayed ranges differ.
     if not writing or args[1] == "full":
         try:
-            from yolocam.client import YoloCamClient
+            from control_client import ControlClient
             address = control_endpoint(dev)
-            client = YoloCamClient(ip=address, timeout=1.5)
+            client = ControlClient(ip=address, timeout=1.5)
             client.connect()
-            controls = native_controls(client)
+            controls = native_controls(client, related_controls(args[2]) if writing else None)
+            if not any(c["available"] for c in controls):
+                raise RuntimeError("Camera did not return any supported controls.")
             full = True
         except Exception as exc:
             control_error = str(exc)
@@ -237,11 +267,11 @@ def operate(args):
         if writing:
             name, value = args[2], validate(controls, args[2], float(args[3]))
             if full:
-                from yolocam.params import sharpness_to_wire, zoom_raw_to_mult
-                wire = zoom_raw_to_mult(value) if name == "zoom" else sharpness_to_wire(value) if name == "sharpness" else value
+                from yolocam.params import sharpness_to_wire
+                wire = sharpness_to_wire(value) if name == "sharpness" else value
                 if not client.set_param(name, wire):
                     raise RuntimeError("The camera rejected this setting.")
-                controls = native_controls(client)
+                controls = native_controls(client, related_controls(name, after=True))
             else:
                 command("v4l2-ctl", "-d", dev, "--set-ctrl", f"{name}={value}")
                 controls = uvc_controls(dev)
@@ -251,17 +281,24 @@ def operate(args):
             message = "Setting applied and verified."
         if not controls:
             raise RuntimeError("The camera did not expose any supported settings.")
+        unavailable = [c["label"] for c in controls if c.get("available") is False]
+        if unavailable:
+            message += (" " if message else "") + "Unavailable: " + ", ".join(unavailable) + ". Refresh to retry."
         return dict(ok=True, connected=True, transport="full" if full else "usb", device=dev,
-                    controls=controls, message=message, controlAddress=address,
-                    controlError=control_error, **preview_settings(dev))
+                    controls=controls, partial=bool(writing and full), message=message, controlAddress=address,
+                    controlError=control_error, **({} if writing and full else preview_settings(dev)))
     finally:
         if client:
             client.disconnect()
 
 
+class OperationTimeout(BaseException):
+    """Cannot be swallowed by fallback or library Exception handlers."""
+
+
 def main():
     def timeout(*_):
-        raise TimeoutError("Camera request timed out. Reconnect USB and refresh.")
+        raise OperationTimeout("Camera request timed out. Reconnect USB and refresh.")
     signal.signal(signal.SIGALRM, timeout)
     signal.alarm(22)
     runtime = Path(os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}"))
@@ -269,7 +306,7 @@ def main():
         with (runtime / "omarchy-yolocam.lock").open("w") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             result = operate(sys.argv[1:])
-    except Exception as exc:
+    except (Exception, OperationTimeout) as exc:
         result = dict(ok=False, connected=False, controls=[], message=str(exc) or "Camera is busy. Try again.")
     print(json.dumps(result))
     return 0 if result["ok"] else 1

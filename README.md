@@ -14,6 +14,8 @@ zoom, image settings, and a local video preview with selectable resolution.
 - USB fallback for the standard controls the camera exposes through V4L2.
 - Preview at 720p/1080p up to 60 fps, or 4K up to 30 fps. Choices come from the
   connected camera; the preview selection is remembered between sessions.
+- Targeted, verified updates: measured focus changes in 0.43 s and exposure
+  compensation in 0.49 s on the tested S3. See [optimization results](docs/optimization.md).
 - Changes are read back from the camera before reporting success. Opening the
   panel reads settings without applying defaults.
 
@@ -108,12 +110,15 @@ Camera settings and any USB network profile you configured are left in place.
 
 ```bash
 python3 -B -m unittest discover -s .
+node --test test_state.cjs
 omarchy plugin validate .
 ```
 
-Install the pinned protobuf dependency to exercise tests with native protocol
-imports. Ten tests cover control validation/readback, preview modes and
-preferences, camera address discovery, and USB fallback.
+Install the pinned protobuf dependency before running Python tests; Node.js is
+needed only for JavaScript tests. Tests cover control validation/readback, native
+transport faults, partial panel updates, preview modes and startup failures,
+camera address discovery, and USB fallback. See [the plan and measured results](docs/optimization.md)
+for reproducible hardware benchmarks.
 
 Verified with an S3 on Omarchy on 2026-09-20: autofocus mode, exposure
 compensation, manual exposure mode, ISO and shutter writes passed readback and

@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import qs.Ui
 import qs.Commons
+import "State.js" as CameraState
 
 Panel {
   id: root
@@ -43,7 +44,7 @@ Panel {
   }
   function setValue(control, value) { run(["set", snapshot.transport, control.id, String(Math.round(value))]); }
   function display(control, value) {
-    if (value < control.minimum || value > control.maximum) return "Unknown";
+    if (value === null || value < control.minimum || value > control.maximum) return "Unknown";
     if (control.id === "zoom" || control.id === "zoom_absolute") return ((value - 50) / 16 + 1).toFixed(2) + "×";
     if (control.id === "wb-temp" || control.id === "white_balance_temperature") return Math.round(value) + " K";
     return String(Math.round(value));
@@ -67,8 +68,7 @@ Panel {
         var result = JSON.parse(output.text);
         root.failed = !result.ok;
         root.message = result.message || "Camera ready.";
-        if (result.controls !== undefined) root.snapshot = result;
-        else if (result.previewModes !== undefined) root.snapshot = Object.assign({}, root.snapshot, {previewModes: result.previewModes, previewMode: result.previewMode});
+        root.snapshot = CameraState.merge(root.snapshot, result);
       } catch (e) {
         root.failed = true;
         root.snapshot = {connected: false, controls: []};
@@ -208,7 +208,7 @@ Panel {
                   bar: root.bar
                   minimum: control.modelData.minimum
                   maximum: control.modelData.maximum
-                  value: control.modelData.value
+                  value: control.modelData.value === null ? control.modelData.minimum : control.modelData.value
                   integer: true
                   step: control.modelData.step
                   onReleased: function(v) { root.setValue(control.modelData, v); }

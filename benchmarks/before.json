@@ -1,0 +1,48 @@
+{
+  "repetitions": 5,
+  "clock": "perf_counter, fresh CLI process, milliseconds",
+  "operations": {
+    "status": {
+      "samples_ms": [
+        1487.43,
+        1489.95,
+        1489.53,
+        1491.93,
+        1488.05
+      ],
+      "median_ms": 1489.53,
+      "min_ms": 1487.43,
+      "max_ms": 1491.93
+    },
+    "focus-mode": {
+      "samples_ms": [
+        3302.86,
+        3088.95,
+        3089.28,
+        3090.11,
+        3089.67
+      ],
+      "median_ms": 3089.67,
+      "min_ms": 3088.95,
+      "max_ms": 3302.86
+    },
+    "exposure-ev": {
+      "samples_ms": [
+        3090.06,
+        3091.14,
+        3090.12,
+        3090.59,
+        3090.32
+      ],
+      "median_ms": 3090.32,
+      "min_ms": 3090.06,
+      "max_ms": 3091.14
+    }
+  },
+  "initial_values": {
+    "exposure-mode": 0,
+    "exposure-ev": 4,
+    "focus-mode": 4
+  },
+  "restored": true
+}

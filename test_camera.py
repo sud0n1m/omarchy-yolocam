@@ -1,5 +1,6 @@
 import unittest
 import tempfile
+import subprocess
 from pathlib import Path
 from unittest.mock import patch
 
@@ -88,6 +89,7 @@ User Controls
         with patch.object(camera, "device", return_value="/dev/test"), \
              patch.object(camera, "preview_settings", return_value=dict(previewModes=[mode], previewMode=mode["id"])), \
              patch.object(camera.subprocess, "Popen") as launch:
+            launch.return_value.wait.side_effect = subprocess.TimeoutExpired("mpv", 0.6)
             self.assertTrue(camera.operate(["preview"])["ok"])
         self.assertIn("--demuxer-lavf-o=video_size=3840x2160,input_format=mjpeg,framerate=30", launch.call_args.args[0])
 

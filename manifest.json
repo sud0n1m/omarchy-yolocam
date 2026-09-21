@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "sudonim.yolocam",
   "name": "YoloCam S3",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "author": "Colin Nederkoorn",
   "description": "YoloCam S3 settings with verified readback and USB fallback.",
   "kinds": ["bar-widget"],

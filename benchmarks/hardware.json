@@ -1,0 +1,12 @@
+{
+  "exposure_mode_gating": true,
+  "white_balance_gating": true,
+  "modes_restored": true,
+  "usb_settings_unchanged": true,
+  "preview_frames": {
+    "1280x720@60": 2,
+    "1920x1080@60": 2,
+    "3840x2160@30": 2
+  },
+  "preview_preference_unchanged": true
+}

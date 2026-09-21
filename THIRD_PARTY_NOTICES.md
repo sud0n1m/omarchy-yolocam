@@ -9,6 +9,10 @@ The upstream copyright notices, protocol schema, generated protobuf source,
 package metadata, and full license are retained. No upstream installer,
 camera shell login, or firmware updater is invoked by this plugin.
 
+The plugin uses the upstream schema, framing helpers and parameter definitions.
+`control_client.py` provides a separate short-lived integer-control transport;
+the vendored upstream library is retained without modifications.
+
 The Omarchy UI and control adapter are Copyright (C) 2026 Colin Nederkoorn,
 also licensed under GPL-3.0-or-later.
 
